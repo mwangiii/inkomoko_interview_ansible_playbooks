@@ -1,0 +1,55 @@
+---
+- name: Provision Inkomoko Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    region: eu-north-1
+    key_name: inkomoko
+    instance_type: t3.medium
+    ami_id: ami-0867f6e2fa5f9f84e  
+
+  tasks:
+    - name: Create inkomoko-sg security group
+      amazon.aws.ec2_group:
+        name: inkomoko-sg
+        description: Security group for Inkomoko app and Jenkins
+        region: "{{ region }}"
+        rules:
+          - proto: tcp
+            ports: [22, 80, 443, 8080]
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+        state: present
+      register: inkomoko_sg
+
+    - name: Launch inkomoko-backend EC2 instance
+      amazon.aws.ec2_instance:
+        name: inkomoko-backend
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+        security_group: "{{ inkomoko_sg.group_id }}"
+        tags:
+          Role: backend
+          Name: inkomoko-backend
+
+    - name: Launch inkomoko-reverse-proxy EC2 instance
+      amazon.aws.ec2_instance:
+        name: inkomoko-reverse-proxy
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+        security_group: "{{ inkomoko_sg.group_id }}"
+        tags:
+          Role: proxy
+          Name: inkomoko-reverse-proxy
