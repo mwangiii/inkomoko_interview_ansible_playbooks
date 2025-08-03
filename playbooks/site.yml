@@ -1,0 +1,12 @@
+---
+- name: Common setup for all hosts
+  hosts: all
+  become: yes
+  roles:
+    - role: ../../roles/common
+
+- name: Jenkins setup
+  hosts: jenkins
+  become: yes
+  roles:
+    - role: ../../roles/jenkins
