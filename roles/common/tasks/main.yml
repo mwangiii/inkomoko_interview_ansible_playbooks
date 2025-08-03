@@ -16,6 +16,7 @@
       - docker-compose
       - python3-pip
       - git
+      - rsync
     update_cache: yes
     state: present
   become: yes

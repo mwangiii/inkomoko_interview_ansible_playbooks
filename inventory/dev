@@ -1,8 +1,11 @@
 [jenkins]
-13.61.147.93 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/inkomoko.pem
+13.53.214.17 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/inkomoko.pem
 
 [backend]
-13.60.245.204 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/inkomoko.pem
+13.60.239.126 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/inkomoko.pem
+
+[proxy]
+16.16.58.85 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/inkomoko.pem
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3

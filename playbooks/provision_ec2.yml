@@ -8,13 +8,13 @@
     region: eu-north-1
     key_name: inkomoko
     instance_type: t3.medium
-    ami_id: ami-0867f6e2fa5f9f84e  
+    ami_id: ami-0867f6e2fa5f9f84e
 
   tasks:
     - name: Create inkomoko-sg security group
       amazon.aws.ec2_group:
         name: inkomoko-sg
-        description: Security group for Inkomoko app and Jenkins
+        description: Security group for Inkomoko app, proxy, and Jenkins
         region: "{{ region }}"
         rules:
           - proto: tcp
@@ -53,3 +53,17 @@
         tags:
           Role: proxy
           Name: inkomoko-reverse-proxy
+
+    - name: Launch inkomoko-jenkins EC2 instance
+      amazon.aws.ec2_instance:
+        name: inkomoko-jenkins
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+        security_group: "{{ inkomoko_sg.group_id }}"
+        tags:
+          Role: jenkins
+          Name: inkomoko-jenkins

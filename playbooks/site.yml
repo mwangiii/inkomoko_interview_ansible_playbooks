@@ -1,12 +1,21 @@
 ---
 - name: Common setup for all hosts
   hosts: all
-  become: yes
   roles:
     - role: ../../roles/common
 
-- name: Jenkins setup
+
+- name: Setup Jenkins
   hosts: jenkins
-  become: yes
   roles:
     - role: ../../roles/jenkins
+
+- name: Setup Backend App
+  hosts: backend
+  roles:
+    - role: ../../roles/backend
+
+- name: Setup Reverse Proxy
+  hosts: proxy
+  roles:
+    - role: ../../roles/proxy

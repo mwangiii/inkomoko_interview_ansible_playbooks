@@ -1,0 +1,14 @@
+---
+- name: Copy application files to the server
+  synchronize:
+    src: ../../../../flask_auth_inkomonko/
+    dest: /home/ubuntu/app
+    recursive: yes
+
+- name: Change to app directory and run docker-compose
+  shell: |
+    cd /home/ubuntu/app
+    docker-compose down || true
+    docker-compose up -d --build
+  args:
+    executable: /bin/bash
