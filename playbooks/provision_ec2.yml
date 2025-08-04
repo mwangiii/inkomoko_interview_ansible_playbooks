@@ -14,17 +14,22 @@
     - name: Create inkomoko-sg security group
       amazon.aws.ec2_group:
         name: inkomoko-sg
-        description: Security group for Inkomoko app, proxy, and Jenkins
+        description: Security group for Inkomoko app, proxy, Jenkins, and monitoring
         region: "{{ region }}"
         rules:
           - proto: tcp
-            ports: [22, 80, 443, 8080]
+            ports: [22, 80, 443, 8080,3000]
             cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 5000
+            to_port: 5000
+            cidr_ip: 172.31.0.0/16
         rules_egress:
           - proto: all
             cidr_ip: 0.0.0.0/0
         state: present
       register: inkomoko_sg
+      tags: create_sg
 
     - name: Launch inkomoko-backend EC2 instance
       amazon.aws.ec2_instance:
@@ -39,6 +44,7 @@
         tags:
           Role: backend
           Name: inkomoko-backend
+      tags: launch_backend
 
     - name: Launch inkomoko-reverse-proxy EC2 instance
       amazon.aws.ec2_instance:
@@ -53,6 +59,7 @@
         tags:
           Role: proxy
           Name: inkomoko-reverse-proxy
+      tags: launch_proxy
 
     - name: Launch inkomoko-jenkins EC2 instance
       amazon.aws.ec2_instance:
@@ -67,3 +74,19 @@
         tags:
           Role: jenkins
           Name: inkomoko-jenkins
+      tags: launch_jenkins
+
+    - name: Launch inkomoko-monitoring EC2 instance
+      amazon.aws.ec2_instance:
+        name: inkomoko-monitoring
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        wait: yes
+        count: 1
+        security_group: "{{ inkomoko_sg.group_id }}"
+        tags:
+          Role: monitoring
+          Name: inkomoko-monitoring
+      tags: launch_monitoring
